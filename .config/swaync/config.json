@@ -2,7 +2,7 @@
   "$schema": "/etc/xdg/swaync/configSchema.json",
   "positionX": "right",
   "positionY": "top",
-	"cssPriority": "user",
+  "cssPriority": "user",
 
   "control-center-width": 380,
   "control-center-height": 760, 
@@ -27,19 +27,7 @@
   "hide-on-clear": false,
   "hide-on-action": false,
   "script-fail-notify": true,
-  "scripts": {
-    "example-script": {
-      "exec": "echo 'Do something...'",
-      "urgency": "Normal"
-    }
-  },
-  "notification-visibility": {
-    "example-name": {
-      "state": "muted",
-      "urgency": "Low",
-      "app-name": "Spotify"
-    }
-  },
+
   "widgets": [
     "buttons-grid",
     "mpris",
@@ -47,6 +35,7 @@
     "dnd",
     "notifications"
   ],
+
   "widget-config": {
     "title": {
       "text": "Notifications",
@@ -64,14 +53,10 @@
       "image-size": 96,
       "image-radius": 12
     },
-    "volume": {
-      "label": "󰕾",
-        "show-per-app": true
-    },
     "buttons-grid": {
       "actions": [
         {
-          "label": " ",
+          "label": "",
           "command": "amixer set Master toggle"
         },
         {
@@ -79,18 +64,17 @@
           "command": "amixer set Capture toggle"
         },
         {
-          "label": " ",
-          "command": "nm-connection-editor"
+          "label": "󰖩",
+          "command": "sh -c 'swaync-client -cp && networkmanager_dmenu'"
         },
         {
           "label": "󰂯",
-          "command": "blueman-manager"
+          "command": "sh -c 'swaync-client -cp && blueman-manager'"
         },
         {
           "label": "󰏘",
           "command": "nwg-look"
         }
-        
       ]
     }
   }
