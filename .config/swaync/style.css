@@ -1,0 +1,54 @@
+/* Importation des couleurs Pywal */
+@import "../../.cache/wal/colors-waybar.css";
+
+* {
+    font-family: "Adwaita Sans", "JetBrainsMono Nerd Font Propo", sans-serif;
+    font-weight: bold;
+}
+
+/* Le panneau principal */
+.control-center {
+    background: alpha(@background, 0.8); /* Fond sombre transparent */
+    border: 1px solid alpha(@color1, 0.4);
+    border-radius: 20px;
+    margin: 10px;
+    padding: 10px;
+}
+
+/* Les notifications individuelles */
+.notification {
+    background: alpha(@color0, 0.6);
+    border: 1px solid alpha(@color1, 0.2);
+    border-radius: 15px;
+    margin: 5px 0;
+    color: @foreground;
+}
+
+/* Titre des notifications */
+.notification-content {
+    margin: 5px;
+}
+
+.notification-default-action:hover {
+    background: alpha(@color4, 0.2); /* Effet de survol avec ta couleur accent */
+}
+
+/* Le bouton "Tout effacer" */
+.control-center-clear-all {
+    background: @color1;
+    color: @color0;
+    border-radius: 50px;
+    padding: 5px;
+    margin: 10px;
+}
+
+/* Le titre "Notifications" en haut */
+.control-center-title {
+    color: @color4;
+    font-size: 1.2rem;
+}
+
+/* Les widgets (Boutons de contrôle s'ils sont activés) */
+.widget-title {
+    color: @color5;
+}

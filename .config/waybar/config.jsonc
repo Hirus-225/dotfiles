@@ -1,0 +1,128 @@
+{
+    "position": "top",
+    "margin-top": 15,
+    "modules-left": [
+        "clock"
+    ],
+    "modules-center": [
+	    "hyprland/workspaces",
+	    "tray"
+    ],
+    "modules-right": [
+	    "group/hardware",
+	    "group/connectivity",
+	    "custom/notification"
+    ],
+
+    "group/hardware": {
+	    "orientation": "horizontal",
+	    "drawer": { // Optionnel : cache les détails et les montre au survol
+		    "transition-duration": 500,
+		    "children-class": "not-memory",
+		    "transition-left-to-right": false
+	    },
+	    "modules": [
+		    "cpu",
+		    "memory",
+		    "temperature"
+	    ]
+    },
+    "group/connectivity": {
+	    "orientation": "horizontal",
+	    "modules": [
+		    "pulseaudio",
+		    "network",
+		    "battery"
+	    ]
+    },
+    "clock": {
+        "interval": 60,
+        "format": "{:%H:%M}",
+        "max-length": 25
+    },
+    "hyprland/workspaces": {
+	    "disable-scroll": false,
+	    "all-outputs": true,
+	    "active-only": false,
+	    "on-click": "activate",
+	    "on-scroll-up": "hyprctl dispatch workspace e-1",
+	    "on-scroll-down": "hyprctl dispatch workspace e+1",
+	    "format": "{icon}",
+	    "format-icons": {
+		    "1": "", // Terminal
+		    "2": "", // Web
+		    "3": "", // Trading (Graphique)
+		    "4": "", // Musique / Focus
+		    "5": "", // RH / Discord / Slack
+		    "urgent": "",
+		    "active": "",
+		    "default": ""
+    },
+    "persistent-workspaces": {
+	    "1": [],
+	    "2": [],
+	    "3": [],
+	    "4": [],
+	    "5": []
+    }
+},
+    "tray": {
+        "icon-size": 21,
+        "spacing": 10
+    },
+    "pulseaudio": {
+	    "format": "{icon}",
+	    "format-muted": "󰝟",
+	    "format-icons": {
+		    "headphone": "",
+		    "hands-free": "",
+		    "headset": "",
+		    "phone": "",
+		    "portable": "",
+		    "car": "",
+		    "default": ["", "", ""]
+	    },
+	    "tooltip-format": "{volume}% - {desc}",
+	    "on-click": "pavucontrol"
+    },
+    "network": {
+	    "interval": 5,
+	    "format-wifi": "",
+	    "format-ethernet": "󰊗",
+	    "format-disconnected": "󰖪", // Icône quand rien n'est connecté
+	    "tooltip-format": "{essid} ({signalStrength}%)", // Info visible uniquement au survol
+	    "on-click": "nm-connection-editor" // Ouvre tes réseaux au clic
+    },
+    "battery": {
+	    "states": {
+		    "warning": 30,
+		    "critical": 15
+	    },
+	    "format": "{icon}",
+	    "format-charging": "󱐋 {icon}", // Petit éclair quand tu branches
+	    "format-plugged": " {icon}",   // Icône prise quand c'est plein et branché
+	    "format-icons": ["", "", "", "", ""],
+	    "tooltip-format": "{capacity}% - {timeTo}", // Le % reste visible au survol de la souris
+	    "interval": 5
+    },
+    "custom/notification": {
+        "tooltip": true,
+        "format": "<span size='16pt'>{icon}</span>",
+        "format-icons": {
+            "notification": "󱅫",
+            "none": "󰂜",
+            "dnd-notification": "󰂠",
+            "dnd-none": "󰪓",
+            "inhibited-notification": "󰂛",
+            "inhibited-none": "󰪑",
+            "dnd-inhibited-notification": "󰂛",
+            "dnd-inhibited-none": "󰪑"
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    }
+}
