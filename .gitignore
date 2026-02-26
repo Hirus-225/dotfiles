@@ -1,4 +1,5 @@
 .cache/
 .db/
-*secrets*
 *.log
+*secrets*
+node_modules/
