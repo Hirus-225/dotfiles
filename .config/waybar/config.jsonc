@@ -36,9 +36,9 @@
 	    ]
     },
     "clock": {
-        "interval": 60,
-        "format": "{:%H:%M}",
-        "max-length": 25
+    "format": "{:%H:%M}",
+    "on-click": "gnome-calendar", // Ouvre l'app au clic
+    "tooltip-format": "{:%d-%m-%Y}" // Affiche la date au survol
     },
     "hyprland/workspaces": {
 	    "disable-scroll": false,
