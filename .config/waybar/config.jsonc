@@ -36,36 +36,20 @@
 	    ]
     },
     "clock": {
-    "format": "{:%H:%M}",
-    "on-click": "gnome-calendar", // Ouvre l'app au clic
-    "tooltip-format": "{:%d-%m-%Y}" // Affiche la date au survol
+	    "format": "{:%H:%M}",
+	    "on-click": "gnome-calendar", // Ouvre l'app au clic
+	    "tooltip-format": "{:%d-%m-%Y}" // Affiche la date au survol
     },
     "hyprland/workspaces": {
-	    "disable-scroll": false,
+	    "disable-scroll": true,
 	    "all-outputs": true,
-	    "active-only": false,
-	    "on-click": "activate",
-	    "on-scroll-up": "hyprctl dispatch workspace e-1",
-	    "on-scroll-down": "hyprctl dispatch workspace e+1",
-	    "format": "{icon}",
+	    "format": "{icon}", // On utilise uniquement l'icône
 	    "format-icons": {
-		    "1": "", // Terminal
-		    "2": "", // Web
-		    "3": "", // Trading (Graphique)
-		    "4": "", // Musique / Focus
-		    "5": "", // RH / Discord / Slack
-		    "urgent": "",
-		    "active": "",
-		    "default": ""
+		    "default": "○",  // Bulle vide pour les bureaux inactifs
+		    "active": "●",   // Bulle pleine pour le bureau actuel
+		    "urgent": ""    // Icône d'alerte si besoin
+	    }
     },
-    "persistent-workspaces": {
-	    "1": [],
-	    "2": [],
-	    "3": [],
-	    "4": [],
-	    "5": []
-    }
-},
     "tray": {
         "icon-size": 21,
         "spacing": 10

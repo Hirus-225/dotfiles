@@ -37,7 +37,7 @@ tooltip label {
 
 #workspaces button {
     padding: 0 6px;
-    margin: 0 3px;
+    margin: 0 5px;
     border-radius: 50px;
     color: @foreground;
     background: transparent;
@@ -47,7 +47,7 @@ tooltip label {
 #workspaces button.active {
     background-color: @color4; /* Couleur pleine pour l'espace actif */
     color: @color0;            /* Texte sombre sur bouton clair */
-    min-width: 40px;
+    min-width: 70px;
 }
 
 /* --- SECTION BULLES (CORRECTION LISIBILITÉ) --- */
