@@ -1,13 +1,8 @@
 {
     "position": "top",
-    "margin-top": 10,
-    "margin-left": 15,
-    "margin-right": 15,
-    "spacing": 5,
-
+    "margin-top": 15,
     "modules-left": [
-	    "custom/menu",
-	    "clock"
+        "clock"
     ],
     "modules-center": [
 	    "hyprland/workspaces",
@@ -32,14 +27,6 @@
 		    "temperature"
 	    ]
     },
-    "cpu": {
-        "format": "󰘚 {usage}%",
-        "on-click": "kitty -e btop"
-    },
-    "memory": {
-        "format": "󰍛 {used}G",
-        "tooltip-format": "RAM: {used}GB / {total}GB"
-    },
     "group/connectivity": {
 	    "orientation": "horizontal",
 	    "modules": [
@@ -48,17 +35,10 @@
 		    "battery"
 	    ]
     },
-        "clock": {
+    "clock": {
 	    "format": "{:%H:%M}",
-	    "format-alt": "󰃭 {:%d·%m·%y}", // Date complète au clic droit ou clic alterné
-	    "tooltip-format": "<tt>{calendar}</tt>",
-	    "calendar": {
-		    "mode": "month",
-		    "on-scroll": 1,
-		    "format": {
-			    "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
-		    }
-	    }
+	    "on-click": "gnome-calendar", // Ouvre l'app au clic
+	    "tooltip-format": "{:%d-%m-%Y}" // Affiche la date au survol
     },
     "hyprland/workspaces": {
 	    "disable-scroll": true,
@@ -75,7 +55,7 @@
         "spacing": 10
     },
     "pulseaudio": {
-	    "format": "{icon} {volume}%",
+	    "format": "{icon}",
 	    "format-muted": "󰝟",
 	    "format-icons": {
 		    "headphone": "",
@@ -95,17 +75,17 @@
 	    "format-ethernet": "󰊗",
 	    "format-disconnected": "󰖪", // Icône quand rien n'est connecté
 	    "tooltip-format": "{essid} ({signalStrength}%)", // Info visible uniquement au survol
-	    "on-click": "networkmanager_dmenu" // Ouvre tes réseaux au clic
+	    "on-click": "nm-connection-editor" // Ouvre tes réseaux au clic
     },
     "battery": {
 	    "states": {
 		    "warning": 30,
 		    "critical": 15
 	    },
-	    "format": "{icon} {capacity}%",
-	    "format-charging": "󱐋 {icon} {capacity}%", // Petit éclair quand tu branches
-	    "format-plugged": " {icon} {capacity}%",   // Icône prise quand c'est plein et branché
-	    "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+	    "format": "{icon}",
+	    "format-charging": "󱐋 {icon}", // Petit éclair quand tu branches
+	    "format-plugged": " {icon}",   // Icône prise quand c'est plein et branché
+	    "format-icons": ["", "", "", "", ""],
 	    "tooltip-format": "{capacity}% - {timeTo}", // Le % reste visible au survol de la souris
 	    "interval": 5
     },
