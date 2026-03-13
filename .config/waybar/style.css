@@ -1,5 +1,4 @@
 @import "../../.cache/wal/colors-waybar.css";
-@import "colors/one-dark.css";
 
 * {
     border: none;
@@ -51,10 +50,8 @@ tooltip label {
 }
 
 /* --- SECTION BULLES (CORRECTION LISIBILITÉ) --- */
-#tray,
-#clock,
-#custom-notification {
-    /* 1. On utilise @color0 (le noir/sombre de Pywal) pour le fond de la bulle */
+#custom-menu {
+    /* 1. on utilise @color0 (le noir/sombre de pywal) pour le fond de la bulle */
     background-color: alpha(@color0, 0.7); 
     padding: 0 15px;
     margin: 0 0 0 12px;
@@ -62,7 +59,22 @@ tooltip label {
     border: 1px solid alpha(@color1, 0.4);
 
 
-    /* 2. Ombre portée pour que le texte "pop" peu importe le fond */
+    /* 2. ombre portée pour que le texte "pop" peu importe le fond */
+    text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
+}
+
+#tray,
+#clock,
+#custom-notification {
+    /* 1. on utilise @color0 (le noir/sombre de pywal) pour le fond de la bulle */
+    background-color: alpha(@color0, 0.7); 
+    padding: 0 15px;
+    margin: 0 0 0 12px;
+    border-radius: 50px;
+    border: 1px solid alpha(@color1, 0.4);
+
+
+    /* 2. ombre portée pour que le texte "pop" peu importe le fond */
     text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.8);
 }
 
@@ -107,7 +119,9 @@ tooltip label {
 #custom-notification { 
     color: @color6; 
 }
-
+#custom-menu {
+	color: @color4;
+}
 /* Animation pour la batterie */
 @keyframes blink {
     to {

@@ -33,12 +33,19 @@
 	    ]
     },
     "cpu": {
-        "format": "󰘚 {usage}%",
-        "on-click": "kitty -e btop"
+	    "format": "󰘚 {usage}%",
+	    "on-click": "kitty -e btop"
     },
     "memory": {
-        "format": "󰍛 {used}G",
-        "tooltip-format": "RAM: {used}GB / {total}GB"
+	    "format": "󰍛 {used}G",
+	    "tooltip-format": "RAM: {used}GB / {total}GB"
+    },
+    "temperature": {
+	    "hwmon-path": "/sys/class/hwmon/hwmon0/temp1_input",
+	    "format": "󰔐 {temperatureC}°C",
+	    "critical-threshold": 75,
+	    "format-critical": "󰸁 {temperatureC}°C",
+	    "interval": 5
     },
     "group/connectivity": {
 	    "orientation": "horizontal",
@@ -61,15 +68,21 @@
 	    }
     },
     "hyprland/workspaces": {
-	    "disable-scroll": true,
-	    "all-outputs": true,
-	    "format": "{icon}", // On utilise uniquement l'icône
-	    "format-icons": {
-		    "default": "○",  // Bulle vide pour les bureaux inactifs
-		    "active": "●",   // Bulle pleine pour le bureau actuel
-		    "urgent": ""    // Icône d'alerte si besoin
-	    }
+    "disable-scroll": true,
+    "all-outputs": true,
+    "on-click": "activate", 
+    "format": "{icon}",
+    "persistent-workspaces": {
+        "*": 5 
     },
+    "format-icons": {
+        "active": "●",      // Bureau actuel (rempli)
+        "default": "",     // Bureau inactif MAIS occupé par des fenêtres (cercle avec point)
+        "empty": "○",       // Bureau totalement vide
+        "urgent": "",      // Alerte
+        "special": "󰠱"      // Icône pour le scratchpad (bureau spécial Hyprland)
+    }
+},
     "tray": {
         "icon-size": 21,
         "spacing": 10
@@ -90,12 +103,12 @@
 	    "on-click": "pavucontrol"
     },
     "network": {
-	    "interval": 5,
+	    "interval": 3,
 	    "format-wifi": "",
 	    "format-ethernet": "󰊗",
-	    "format-disconnected": "󰖪", // Icône quand rien n'est connecté
-	    "tooltip-format": "{essid} ({signalStrength}%)", // Info visible uniquement au survol
-	    "on-click": "networkmanager_dmenu" // Ouvre tes réseaux au clic
+	    "tooltip-format-wifi": "{essid} — {signalStrength}% — ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
+	    "tooltip-format-ethernet": "{ifname} — {ipaddr}",
+	    "on-click": "networkmanager_dmenu"
     },
     "battery": {
 	    "states": {
@@ -128,5 +141,10 @@
         "on-click": "swaync-client -t -sw",
         "on-click-right": "swaync-client -d -sw",
         "escape": true
+    },
+    "custom/menu":{
+    "format": "󰮯",
+    "tooltip": false,
+    "on-click": "rofi -show drun"
     }
 }
