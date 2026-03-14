@@ -1,0 +1,166 @@
+{
+    // --- PARTIE GAUCHE ---
+    "custom/menu": {
+        "format": "󰮯",
+        "tooltip": false,
+        "on-click": "rofi -show drun"
+    },
+
+    "hyprland/window": {
+        "format": "{class}",
+        "separate-outputs": true,
+        "max-length": 15,
+        "rewrite": {
+            "": "Desktop",
+            "firefox": "Browser",
+            "kitty": "Terminal",
+            "1password": "Pass",
+            "thunar": "Files",
+            "discord": "Discord",
+            "steam": "Steam",
+            "heroic": "Heroic",
+            "pavucontrol": "Audio",
+            "btop": "Monitor"
+        }
+    },
+
+    // --- CENTRE ---
+    "clock": {
+        "format": "{:%H:%M}",
+        "format-alt": "󰃭 {:%d·%m·%y}",
+        "tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "on-scroll": 1,
+            "weeks-pos": "right",
+            "format": {
+                "months": "<span color='#cdd6f4'><b>{}</b></span>",
+                "weekdays": "<span color='#7f849c'>{}</span>",
+                "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+            }
+        }
+    },
+
+    "hyprland/workspaces": {
+        "disable-scroll": true,
+        "all-outputs": true,
+        "on-click": "activate",
+        "format": "{icon}",
+        "persistent-workspaces": { "*": 5 },
+        "tooltip": true,
+        "tooltip-format": "Bureau {id}",
+        "format-icons": {
+            "active": "●",
+            "default": "○",
+            "empty": "○",
+            "urgent": "󰀦",
+            "special": "󰠱"
+        }
+    },
+
+    // --- PARTIE DROITE ---
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟",
+        "format-icons": {
+		"headphone": "",
+		    "hands-free": "",
+		    "headset": "",
+		    "phone": "",
+		    "portable": "",
+		    "car": "",
+		    "default": ["", "", ""]
+	},
+        "tooltip-format": "{volume}% — {desc}",
+        "on-click": "pavucontrol",
+        "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
+        "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%"
+    },
+
+    "network": {
+        "interval": 3,
+        "format-wifi": "  {signalStrength}%",
+        "format-ethernet": "󰊗",
+        "format-disconnected": "󰖪",
+        "tooltip-format-wifi": "{essid} — {signalStrength}% — ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
+        "tooltip-format-ethernet": "{ifname} — {ipaddr}",
+        "tooltip-format-disconnected": "Aucune connexion",
+        "on-click": "networkmanager_dmenu"
+    },
+
+    "battery": {
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󱐋 {capacity}%",
+        "format-plugged": "󰚥 {capacity}%",
+        "format-full": "󰁹 Full",
+        "format-icons": ["󰂎", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"],
+        "format-time": "{H}h {M}min",
+        "tooltip-format": "{capacity}% — {timeTo}",
+        "interval": 5
+    },
+
+    // --- TIROIR ---
+    "custom/drawer-icon": {
+        "format": "󰄛",
+        "tooltip": false
+    },
+
+    "bluetooth": {
+        "format": "󰂲",
+        "format-on": "󰂲",
+        "format-off": "󰂲",
+        "format-disabled": "󰂲",
+        "format-connected": "󰂱 {num_connections}",
+        "tooltip-format": "{controller_alias} — {controller_address}",
+        "tooltip-format-connected": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
+        "on-click": "blueman-manager"
+    },
+
+    "tray": {
+        "icon-size": 18,
+        "spacing": 10
+    },
+
+    "custom/notification": {
+        "format": "{icon}",
+        "format-icons": {
+            "notification": "󱅫",
+            "none": "󰂜",
+            "dnd-notification": "󰂠",
+            "dnd-none": "󰪓",
+            "inhibited-notification": "󰂛",
+            "inhibited-none": "󰪑",
+            "dnd-inhibited-notification": "󰂛",
+            "dnd-inhibited-none": "󰪑"
+        },
+        "return-type": "json",
+        "exec-if": "which swaync-client",
+        "exec": "swaync-client -swb",
+        "on-click": "swaync-client -t -sw",
+        "on-click-right": "swaync-client -d -sw",
+        "escape": true
+    },
+
+    "power-profiles-daemon": {
+        "format": "{icon}",
+        "format-icons": {
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
+        },
+        "tooltip-format": "Profil : {profile}",
+        "tooltip": true
+    },
+
+    "custom/power": {
+        "format": "󰐥",
+        "on-click": "/home/zogoue_charles/.local/bin/powermenu.sh
+",
+        "tooltip": false
+    }
+}

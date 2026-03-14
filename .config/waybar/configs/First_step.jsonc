@@ -1,0 +1,51 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height" : 34,
+    "width" : 1200,
+    "margin-left" : 50,
+    "margin-right" : 50, 
+    "margin-top" : 5,
+
+    "fixed-center": true,
+    "include": ["/home/zogoue_charles/.config/waybar/modules/module_first.jsonc"],
+
+    "modules-left": [
+            "group/app-focus"
+    ],
+    "modules-center": [
+        "clock",
+        "hyprland/workspaces"
+    ],
+    "modules-right": [
+	            "group/connectivity",  // Wi-Fi, Son, Batterie
+		    "group/overflow",      // Le tiroir (SwayNC, BT, Tray)
+		    "custom/power"         // Power bouton
+    ],
+
+    // --- ORGANISATION DES GROUPES DANS L'ÎLOT ---
+
+    "group/app-focus": {
+        "orientation": "horizontal",
+        "modules": ["custom/menu", "hyprland/window"]
+    },
+
+    "group/connectivity": {
+        "orientation": "horizontal",
+        "modules": ["network", "pulseaudio", "battery"]
+    },
+
+    "group/overflow": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 500,
+            "transition-left-to-right": true
+        },
+        "modules": [
+            "custom/drawer-icon",
+            "custom/notification",
+            "bluetooth",
+            "tray"
+        ]
+    }
+}

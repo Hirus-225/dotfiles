@@ -1,0 +1,266 @@
+/* ─────────────────────────────────────────
+   1. RESET GLOBAL
+───────────────────────────────────────── */
+* {
+    all: unset;
+    font-family: "Iosevka Nerd Font Propo", "JetBrainsMono Nerd Font", sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+    font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
+}
+
+/* ─────────────────────────────────────────
+   2. FENÊTRE PRINCIPALE
+───────────────────────────────────────── */
+window#waybar {
+    background: transparent;
+}
+
+window#waybar > box {
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px solid alpha(@color1, 0.3);
+    border-radius: 12px;
+    margin: 5px 0;
+    padding: 2px 8px;
+}
+
+/* ─────────────────────────────────────────
+   3. TOOLTIPS
+───────────────────────────────────────── */
+tooltip {
+    background: alpha(@color0, 0.9);
+    border: 2px solid alpha(@color4, 0.8);
+    border-radius: 10px;
+}
+
+tooltip label {
+    color: @foreground;
+    padding: 8px;
+}
+
+/* ─────────────────────────────────────────
+   4. MODULES NIMBÉS — base commune
+───────────────────────────────────────── */
+#custom-menu,
+#window,
+#clock,
+#workspaces,
+#group-connectivity,
+#group-overflow,
+#custom-power {
+    background: alpha(@color12, 0.2);
+    margin: 4px 3px;
+    padding: 2px 10px;
+    border-radius: 8px;
+    color: @foreground;
+    transition: all 0.2s ease-in-out; /* ← déplacé ici */
+}
+
+/* ─────────────────────────────────────────
+   5. WORKSPACES
+───────────────────────────────────────── */
+#workspaces {
+    background: alpha(@color4, 0.1);
+    border: 1px solid transparent;
+}
+
+#workspaces button {
+    color: alpha(@foreground, 0.4);
+    padding: 0 6px;
+    border-radius: 50px;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+#workspaces button:hover {
+    color: @color4;
+    background: alpha(@color4, 0.15);
+    border-color: alpha(@color4, 0.4);
+}
+
+#workspaces button.active {
+    color: @color4;
+    background: alpha(@color4, 0.2);
+    border-color: alpha(@color4, 0.6);
+    box-shadow: 0 0 6px alpha(@color4, 0.4);
+    text-shadow: 0 0 5px alpha(@color4, 0.5);
+}
+
+#workspaces button.occupied {
+    color: alpha(@color4, 0.8);
+}
+
+#workspaces button.urgent {
+    color: @color1;
+    background: alpha(@color1, 0.2);
+    border-color: alpha(@color1, 0.5);
+}
+
+/* ─────────────────────────────────────────
+   6. WINDOW (titre app active)
+───────────────────────────────────────── */
+#window {
+    color: @color4;
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* ─────────────────────────────────────────
+   7. MODULES DROITE — base
+───────────────────────────────────────── */
+#network,
+#pulseaudio,
+#battery,
+#bluetooth,
+#tray,
+#custom-notification,
+#power-profiles-daemon {
+    padding: 0 6px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Couleurs de base */
+#network { color: @color5; }
+#pulseaudio { color: @color3; }
+#battery { color: @color2; }
+#bluetooth { color: @color6; }
+#custom-notification { color: @color6; }
+#power-profiles-daemon { color: @color4; }
+
+/* ─────────────────────────────────────────
+   8. HOVERS modules droite
+───────────────────────────────────────── */
+#network:hover {
+    background: alpha(@color5, 0.15);
+    border-color: alpha(@color5, 0.4);
+    box-shadow: 0 0 6px alpha(@color5, 0.2);
+}
+
+#pulseaudio:hover {
+    background: alpha(@color3, 0.15);
+    border-color: alpha(@color3, 0.4);
+    box-shadow: 0 0 6px alpha(@color3, 0.2);
+}
+
+#battery:hover {
+    background: alpha(@color2, 0.15);
+    border-color: alpha(@color2, 0.4);
+}
+
+#bluetooth:hover {
+    background: alpha(@color6, 0.15);
+    border-color: alpha(@color6, 0.4);
+}
+
+#custom-notification:hover {
+    background: alpha(@color6, 0.15);
+    border-color: alpha(@color6, 0.4);
+}
+
+/* ─────────────────────────────────────────
+   9. ÉTATS SPÉCIAUX
+───────────────────────────────────────── */
+
+/* Batterie */
+#battery.warning:not(.charging) {
+    color: @color3;
+    background: alpha(@color3, 0.12);
+    border-color: alpha(@color3, 0.35);
+}
+
+#battery.critical:not(.charging) {
+    color: @color1;
+    background: alpha(@color1, 0.2);
+    border-color: alpha(@color1, 0.5);
+    animation: blink 1s ease infinite;
+}
+
+#battery.charging {
+    color: @color3;
+    background: alpha(@color3, 0.12);
+    border-color: alpha(@color3, 0.3);
+}
+
+/* Réseau déconnecté */
+#network.disconnected {
+    color: @color1;
+    background: alpha(@color1, 0.12);
+    border-color: alpha(@color1, 0.4);
+}
+
+/* Pulseaudio muet */
+#pulseaudio.muted {
+    color: alpha(@foreground, 0.35);
+    background: alpha(@color0, 0.4);
+    border-color: alpha(@foreground, 0.15);
+}
+
+/* Bluetooth connecté */
+#bluetooth.connected {
+    color: @color4;
+    background: alpha(@color4, 0.12);
+    border-color: alpha(@color4, 0.3);
+}
+
+/* Power profiles */
+#power-profiles-daemon.performance {
+    color: @color1;
+}
+
+#power-profiles-daemon.balanced {
+    color: @color4;
+}
+
+#power-profiles-daemon.power-saver {
+    color: @color2;
+}
+
+/* ─────────────────────────────────────────
+   10. TIROIR & POWER
+───────────────────────────────────────── */
+#custom-drawer-icon {
+    color: alpha(@foreground, 0.5);
+    padding: 0 5px;
+    transition: all 0.2s ease-in-out;
+}
+
+#custom-drawer-icon:hover {
+    color: @foreground;
+}
+
+#custom-power {
+    background: alpha(@color1, 0.3);
+    color: @color1;
+    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+}
+
+#custom-power:hover {
+    background: alpha(@color1, 0.5);
+    border-color: alpha(@color1, 0.6);
+    box-shadow: 0 0 8px alpha(@color1, 0.3);
+}
+
+/* ─────────────────────────────────────────
+   11. HOVERS modules gauche
+───────────────────────────────────────── */
+#custom-menu:hover {
+    background: alpha(@color4, 0.4);
+}
+
+#clock:hover {
+    background: alpha(@color4, 0.3);
+    border-color: alpha(@color4, 0.4);
+}
+
+/* ─────────────────────────────────────────
+   12. ANIMATION
+───────────────────────────────────────── */
+@keyframes blink {
+    to {
+        background-color: transparent;
+        color: @color1;
+    }
+}
