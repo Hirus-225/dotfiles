@@ -18,9 +18,13 @@
             "thunar": "Files",
             "discord": "Discord",
             "steam": "Steam",
-            "heroic": "Heroic",
+            "org.gnome.Nautilus": "Fichiers",
             "pavucontrol": "Audio",
-            "btop": "Monitor"
+            "btop++": "Monitor",
+            "org.gnome.DiskUtility": "Gestionnaire disque dur",
+            "org.gnome.Calendar": "Calendrier",
+            "org.telegram.desktop": "Telegram",
+            "org.gnome.Evince": "PDF"
         }
     },
 
@@ -53,8 +57,32 @@
             "active": "●",
             "default": "○",
             "empty": "○",
+            "occupied": "◉",
             "urgent": "󰀦",
             "special": "󰠱"
+        }
+    },
+
+    // --- MPRIS ---
+    "mpris": {
+        "format": "{player_icon} {artist} — {title}",
+        "format-paused": "{player_icon} {artist} — {title}",
+        "max-length": 40,
+        "interval": 1,
+        "on-click": "playerctl play-pause",
+        "on-click-right": "playerctl next",
+        "on-scroll-up": "playerctl next",
+        "on-scroll-down": "playerctl previous",
+        "player-icons": {
+            "default": "",
+            "firefox": "",
+            "spotify": "",
+            "vlc": "󰕼"
+        },
+        "status-icons": {
+            "paused": "󰐎",
+            "playing": "",
+            "stopped": ""
         }
     },
 
@@ -63,14 +91,14 @@
         "format": "{icon} {volume}%",
         "format-muted": "󰝟",
         "format-icons": {
-		"headphone": "",
-		    "hands-free": "",
-		    "headset": "",
-		    "phone": "",
-		    "portable": "",
-		    "car": "",
-		    "default": ["", "", ""]
-	},
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "portable": "",
+            "car": "",
+            "default": ["", "", ""]
+        },
         "tooltip-format": "{volume}% — {desc}",
         "on-click": "pavucontrol",
         "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
@@ -79,7 +107,7 @@
 
     "network": {
         "interval": 3,
-        "format-wifi": "  {signalStrength}%",
+        "format-wifi": "  {signalStrength}%",
         "format-ethernet": "󰊗",
         "format-disconnected": "󰖪",
         "tooltip-format-wifi": "{essid} — {signalStrength}% — ↓{bandwidthDownBits} ↑{bandwidthUpBits}",
@@ -159,8 +187,7 @@
 
     "custom/power": {
         "format": "󰐥",
-        "on-click": "/home/zogoue_charles/.local/bin/powermenu.sh
-",
+        "on-click": "/home/zogoue_charles/.local/bin/powermenu.sh",
         "tooltip": false
     }
 }

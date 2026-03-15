@@ -11,7 +11,8 @@
     "include": ["/home/zogoue_charles/.config/waybar/modules/module_first.jsonc"],
 
     "modules-left": [
-            "group/app-focus"
+            "group/app-focus",
+	    "mpris"
     ],
     "modules-center": [
         "clock",

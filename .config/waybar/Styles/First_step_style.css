@@ -88,6 +88,8 @@ tooltip label {
 
 #workspaces button.occupied {
     color: alpha(@color4, 0.8);
+    background: alpha(@color4, 0.1);
+    border-color: alpha(@color4, 0.2);
 }
 
 #workspaces button.urgent {
@@ -255,6 +257,20 @@ tooltip label {
     border-color: alpha(@color4, 0.4);
 }
 
+#mpris {
+    color: @color6;
+    background: alpha(@color6, 0.15);
+    border: 1px solid alpha(@color6, 0.3);
+    border-radius: 8px;
+    padding: 0 10px;
+    margin: 4px 3px;
+    transition: all 0.2s ease-in-out;
+}
+
+#mpris:hover {
+    background: alpha(@color6, 0.25);
+    border-color: alpha(@color6, 0.5);
+}
 /* ─────────────────────────────────────────
    12. ANIMATION
 ───────────────────────────────────────── */
