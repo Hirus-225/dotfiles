@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────
-   1. RESET GLOBAL
+1. RESET GLOBAL
 ───────────────────────────────────────── */
 * {
     all: unset;
@@ -10,7 +10,7 @@
 }
 
 /* ─────────────────────────────────────────
-   2. FENÊTRE PRINCIPALE
+2. FENÊTRE PRINCIPALE
 ───────────────────────────────────────── */
 window#waybar {
     background: transparent;
@@ -25,7 +25,7 @@ window#waybar > box {
 }
 
 /* ─────────────────────────────────────────
-   3. TOOLTIPS
+3. TOOLTIPS
 ───────────────────────────────────────── */
 tooltip {
     background: alpha(@color0, 0.9);
@@ -39,7 +39,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   4. MODULES NIMBÉS — base commune
+4. MODULES NIMBÉS — base commune
 ───────────────────────────────────────── */
 #custom-menu,
 #window,
@@ -57,7 +57,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   5. WORKSPACES
+5. WORKSPACES
 ───────────────────────────────────────── */
 #workspaces {
     background: alpha(@color4, 0.1);
@@ -99,7 +99,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   6. WINDOW (titre app active)
+6. WINDOW (titre app active)
 ───────────────────────────────────────── */
 #window {
     color: @color4;
@@ -108,7 +108,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   7. MODULES DROITE — base
+7. MODULES DROITE — base
 ───────────────────────────────────────── */
 #network,
 #pulseaudio,
@@ -132,7 +132,7 @@ tooltip label {
 #power-profiles-daemon { color: @color4; }
 
 /* ─────────────────────────────────────────
-   8. HOVERS modules droite
+8. HOVERS modules droite
 ───────────────────────────────────────── */
 #network:hover {
     background: alpha(@color5, 0.15);
@@ -162,7 +162,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   9. ÉTATS SPÉCIAUX
+9. ÉTATS SPÉCIAUX
 ───────────────────────────────────────── */
 
 /* Batterie */
@@ -220,7 +220,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   10. TIROIR & POWER
+10. TIROIR & POWER
 ───────────────────────────────────────── */
 #custom-drawer-icon {
     color: alpha(@foreground, 0.5);
@@ -246,7 +246,7 @@ tooltip label {
 }
 
 /* ─────────────────────────────────────────
-   11. HOVERS modules gauche
+11. HOVERS modules gauche
 ───────────────────────────────────────── */
 #custom-menu:hover {
     background: alpha(@color4, 0.4);
@@ -272,7 +272,7 @@ tooltip label {
     border-color: alpha(@color6, 0.5);
 }
 /* ─────────────────────────────────────────
-   12. ANIMATION
+12. ANIMATION
 ───────────────────────────────────────── */
 @keyframes blink {
     to {

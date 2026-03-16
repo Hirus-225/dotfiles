@@ -11,17 +11,17 @@
     "include": ["/home/zogoue_charles/.config/waybar/modules/module_first.jsonc"],
 
     "modules-left": [
-            "group/app-focus",
-	    "mpris"
+        "group/app-focus",
+        "mpris"
     ],
     "modules-center": [
         "clock",
         "hyprland/workspaces"
     ],
     "modules-right": [
-	            "group/connectivity",  // Wi-Fi, Son, Batterie
-		    "group/overflow",      // Le tiroir (SwayNC, BT, Tray)
-		    "custom/power"         // Power bouton
+        "group/connectivity",  // Wi-Fi, Son, Batterie
+        "group/overflow",      // Le tiroir (SwayNC, BT, Tray)
+        "custom/power"         // Power bouton
     ],
 
     // --- ORGANISATION DES GROUPES DANS L'ÎLOT ---
