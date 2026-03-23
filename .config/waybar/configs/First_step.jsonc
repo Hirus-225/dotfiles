@@ -4,7 +4,7 @@
     "height" : 34,
     "width" : 1200,
     "margin-left" : 50,
-    "margin-right" : 50, 
+    "margin-right" : 50,
     "margin-top" : 5,
 
     "fixed-center": true,

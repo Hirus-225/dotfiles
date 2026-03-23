@@ -24,7 +24,9 @@
             "org.gnome.DiskUtility": "Gestionnaire disque dur",
             "org.gnome.Calendar": "Calendrier",
             "org.telegram.desktop": "Telegram",
-            "org.gnome.Evince": "PDF"
+            "org.gnome.Evince": "PDF",
+            "visual-studio-code-electron": "Vs code",
+            "io.github.alainm23.planify": "Planify"
         }
     },
 
@@ -59,7 +61,6 @@
             "empty": "○",
             "occupied": "◉",
             "urgent": "󰀦",
-            "special": "󰠱"
         }
     },
 
@@ -68,15 +69,15 @@
         "format": "{player_icon} {artist} — {title}",
         "format-paused": "{player_icon} {artist} — {title}",
         "max-length": 40,
-        "interval": 1,
+        "interval": 5,
         "on-click": "playerctl play-pause",
         "on-click-right": "playerctl next",
         "on-scroll-up": "playerctl next",
         "on-scroll-down": "playerctl previous",
         "player-icons": {
-            "default": "",
-            "firefox": "",
-            "spotify": "",
+            "default": "󰎆",
+            "firefox": "",
+            "spotify": "",
             "vlc": "󰕼"
         },
         "status-icons": {
@@ -177,9 +178,9 @@
     "power-profiles-daemon": {
         "format": "{icon}",
         "format-icons": {
-            "performance": "",
-            "balanced": "",
-            "power-saver": ""
+            "performance": "",
+            "balanced": "",
+            "power-saver": ""
         },
         "tooltip-format": "Profil : {profile}",
         "tooltip": true
