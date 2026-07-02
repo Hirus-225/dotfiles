@@ -1,37 +1,39 @@
 #!/bin/bash
 
-# Attendre un court instant que Pywal finisse d'écrire
-sleep 0.5
+WAL_COLORS="$HOME/.cache/wal/colors"
+HYPR_COLORS="$HOME/.cache/wal/colors-hyprland.conf"
 
-# Vérifier si le fichier de couleurs de Pywal existe
-if [ -f ~/.cache/wal/colors ]; then
-    # --- Génération pour Hyprland ---
-    COLOR1=$(cat ~/.cache/wal/colors | sed -n '2p' | sed 's/#//')
-    COLOR2=$(cat ~/.cache/wal/colors | sed -n '3p' | sed 's/#//')
+# Attendre que Pywal ait fini d'écrire le fichier de couleurs (max ~2s)
+for _ in $(seq 1 20); do
+    [ -s "$WAL_COLORS" ] && break
+    sleep 0.1
+done
 
-    echo "\$color1 = rgb($COLOR1)" >~/.cache/wal/colors-hyprland.conf
-    echo "\$color2 = rgb($COLOR2)" >>~/.cache/wal/colors-hyprland.conf
-
-    # --- Rechargement des composants UI ---
-
-    # 1. Waybar
-    killall -SIGUSR2 waybar
-
-    # 2. SwayNC (Notification Center)
-    swaync-client -rs
-
-    # 3. SwayOSD (Le widget de volume/luminosité)
-    # On tue le serveur actuel et on le relance pour forcer le refresh du CSS
-    pkill swayosd-server
-    swayosd-server &
-
-    sleep 3
-
-    # 4. Hyprland
-    hyprctl reload
-
-    # Optionnel : Notification de succès
-    # notify-send "Système" "Couleurs mises à jour avec succès" -i "color-management"
-else
+if [ ! -s "$WAL_COLORS" ]; then
     notify-send "Erreur" "Pywal n'a pas encore généré les couleurs."
+    exit 1
 fi
+
+# --- Génération pour Hyprland ---
+COLOR1=$(sed -n '2p' "$WAL_COLORS" | tr -d '#')
+COLOR2=$(sed -n '3p' "$WAL_COLORS" | tr -d '#')
+
+printf '$color1 = rgb(%s)\n$color2 = rgb(%s)\n' "$COLOR1" "$COLOR2" >"$HYPR_COLORS"
+
+# --- Rechargement des composants UI ---
+
+# 1. Waybar
+killall -SIGUSR2 waybar
+
+# 2. SwayNC (Notification Center)
+swaync-client -rs
+
+# 3. SwayOSD : tuer puis relancer pour forcer le refresh du CSS
+pkill swayosd-server
+swayosd-server &
+
+# 4. Hyprland
+hyprctl reload
+
+# Optionnel : Notification de succès
+# notify-send "Système" "Couleurs mises à jour avec succès" -i "color-management"

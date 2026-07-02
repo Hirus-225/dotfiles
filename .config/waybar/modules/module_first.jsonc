@@ -26,7 +26,8 @@
             "org.telegram.desktop": "Telegram",
             "org.gnome.Evince": "PDF",
             "visual-studio-code-electron": "Vs code",
-            "io.github.alainm23.planify": "Planify"
+            "io.github.alainm23.planify": "Planify",
+            "terminal64.exe": "MetaTrader 5"
         }
     },
 
@@ -82,8 +83,8 @@
         },
         "status-icons": {
             "paused": "󰐎",
-            "playing": "",
-            "stopped": ""
+            "playing": "󰐊",
+            "stopped": "󰓛"
         }
     },
 

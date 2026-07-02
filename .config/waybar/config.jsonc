@@ -3,9 +3,3 @@
 		"~/.config/waybar/configs/First_step.jsonc"
 	]
 }
-
-/*{
-	"include" : [
-		"~/.config/waybar/configs/jakoolit_conf.jsonc"
-	]
-}*/
