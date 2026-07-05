@@ -15,10 +15,24 @@ if [ ! -s "$WAL_COLORS" ]; then
 fi
 
 # --- Génération pour Hyprland ---
-COLOR1=$(sed -n '2p' "$WAL_COLORS" | tr -d '#')
-COLOR2=$(sed -n '3p' "$WAL_COLORS" | tr -d '#')
+# On exporte toute la palette ($color0..$colorN) pour que hyprland.conf ET
+# hyprlock.conf puissent référencer n'importe quelle couleur (ex. $color4).
+: >"$HYPR_COLORS"
+i=0
+while IFS= read -r line; do
+    hex=$(printf '%s' "$line" | tr -d '#')
+    [ -n "$hex" ] && printf '$color%d = rgb(%s)\n' "$i" "$hex" >>"$HYPR_COLORS"
+    i=$((i + 1))
+done <"$WAL_COLORS"
 
-printf '$color1 = rgb(%s)\n$color2 = rgb(%s)\n' "$COLOR1" "$COLOR2" >"$HYPR_COLORS"
+# foreground / background (utilisés par hyprlock) depuis colors.sh
+WAL_SH="$HOME/.cache/wal/colors.sh"
+if [ -s "$WAL_SH" ]; then
+    FG=$(sed -n "s/^foreground='#\(.*\)'.*/\1/p" "$WAL_SH")
+    BG=$(sed -n "s/^background='#\(.*\)'.*/\1/p" "$WAL_SH")
+    [ -n "$FG" ] && printf '$foreground = rgb(%s)\n' "$FG" >>"$HYPR_COLORS"
+    [ -n "$BG" ] && printf '$background = rgb(%s)\n' "$BG" >>"$HYPR_COLORS"
+fi
 
 # --- Rechargement des composants UI ---
 
