@@ -11,7 +11,7 @@ PanelWindow {
         right: true
     }
 
-    implicitHeight: 32
+    implicitHeight: 35
     color: Theme.bg
 
     Workspaces {
@@ -27,7 +27,7 @@ PanelWindow {
         anchors.left: workspaces.right
         anchors.right: clock.left
         anchors.leftMargin: 16
-        anchors.rightMargin: 16
+        anchors.rightMargin: 20
     }
 
     Clock {
@@ -36,7 +36,15 @@ PanelWindow {
         anchors.centerIn: parent
     }
 
+    Volume {
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: battery.left
+        anchors.rightMargin: 12
+    }
+
     Battery {
+        id: battery
+
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 12
