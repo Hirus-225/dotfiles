@@ -16,6 +16,10 @@ Singleton {
     property string fontFamily: "JetBrainsMono Nerd Font"
     property int fontSize: 13
 
+    // Partagée entre Bar.qml et ControlCenter.qml : le panneau se place
+    // sous la barre, la constante ne doit exister qu'une fois.
+    property int barHeight: 35
+
     FileView {
         path: Quickshell.env("HOME") + "/.cache/wal/colors.json"
         watchChanges: true
