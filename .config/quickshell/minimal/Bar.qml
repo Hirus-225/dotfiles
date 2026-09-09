@@ -95,8 +95,30 @@ PanelWindow {
         id: battery
 
         anchors.verticalCenter: parent.verticalCenter
+        anchors.right: powerMenu.left
+        anchors.rightMargin: 10
+    }
+
+    // Dernier de la chaîne d'ancrage de droite, donc le seul à tenir
+    // parent.right — la place qu'occupait la batterie jusqu'ici. Tout le reste
+    // du côté droit (tray → bulle → batterie) est une chaîne droite-à-gauche
+    // où chacun s'accroche au précédent ; insérer ici ne déplace donc qu'un
+    // seul ancrage, celui de la batterie.
+    //
+    // Au bout de la barre, et pas entre le tray et la bulle : c'est une action
+    // terminale, pas un état à surveiller du coin de l'œil. Les trois voisins
+    // de gauche décrivent la machine (ce qui tourne, les radios, la charge) ;
+    // ce bouton, lui, l'arrête.
+    //
+    // Rien d'autre à écrire ici : contrairement à l'horloge et à la bulle, il
+    // n'émet aucun signal et n'ouvre aucune fenêtre Quickshell. Le menu est un
+    // Rofi, lancé par le script, hors de ce shell.
+    PowerMenu {
+        id: powerMenu
+
+        anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
-        anchors.rightMargin: 12
+        anchors.rightMargin: 14
     }
 
     // Ouvert par Connectivity, jamais par Battery : un pourcentage de batterie
