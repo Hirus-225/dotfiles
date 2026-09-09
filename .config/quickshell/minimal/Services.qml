@@ -4,6 +4,7 @@ import Quickshell
 import Quickshell.Networking
 import Quickshell.Bluetooth
 import Quickshell.Services.Pipewire
+import Quickshell.Services.SystemTray
 import Quickshell.Services.UPower
 import Quickshell.Io
 import QtQuick
@@ -65,11 +66,11 @@ Singleton {
     property int watchers: 0
     readonly property bool active: watchers > 0
 
-    // La lecture DND se déclenche au passage de 0 à 1 : à l'ouverture du
-    // panneau, jamais avant. Panneau fermé, aucun processus n'est lancé.
+    // Ne déclenche plus de lecture DND à l'ouverture : l'état de swaync est
+    // tenu à jour en permanence par le moniteur, panneau ouvert ou fermé. Le
+    // panneau ne fait plus qu'afficher ce qui est déjà là.
     function acquire(): void {
         root.watchers++;
-        if (root.watchers === 1) root.refreshDnd();
     }
     // GARANTIE 2 — le filet. La destruction du panneau remet le compteur de
     // scans à zéro, et elle arrive EN PREMIER (mesuré). Même si le
@@ -117,8 +118,14 @@ Singleton {
     // détruirait la liaison et figerait l'accès.
 
     // PwNodeAudio n'est peuplé que si le node est suivi par un PwObjectTracker.
-    // Volume.qml en a déjà un, mais la barre ne doit rien devoir au panneau ni
-    // l'inverse : le panneau porte le sien.
+    // Sans tracker, mesuré : volume reste à 0 et volumes à [] indéfiniment.
+    //
+    // Celui-ci est désormais le SEUL de la config. Volume.qml portait le sien
+    // tant qu'il était dans la barre ; il n'y est plus, et la bulle comme le
+    // slider du panneau lisent tous deux `audio` d'ici. Mesuré après le
+    // retrait : Services.audio est peuplé à t+100 ms (pct=58, muted=false)
+    // sans que Volume.qml soit instancié. Le supprimer couperait le son des
+    // deux surfaces à la fois.
     readonly property PwNode sink: Pipewire.defaultAudioSink
     readonly property PwNodeAudio audio: sink?.audio ?? null
 
@@ -290,6 +297,62 @@ Singleton {
 
     readonly property UPowerDevice battery: UPower.displayDevice
 
+    // --- Tray (StatusNotifier) ----------------------------------------------
+    // MESURÉ AVANT D'ÉCRIRE. Sur ce bus, org.kde.StatusNotifierWatcher n'avait
+    // AUCUN propriétaire : Waybar ne tient pas de tray, et le seul nom voisin,
+    // org.x.StatusNotifierWatcher, est un nom DIFFÉRENT — activable, sans
+    // propriétaire, sans rapport pour D-Bus. Le nom était donc libre, et c'est
+    // Quickshell qui le prend en référençant le singleton SystemTray.
+    //
+    // ET LE TIROIR N'EST PAS RESTÉ VIDE — la prémisse était fausse, mesuré.
+    // On attendait un tiroir vide au premier lancement, en supposant qu'un
+    // applet ne publie son item qu'à SON démarrage et que blueman, lancé avant
+    // tout watcher, était perdu pour la session jusqu'à un redémarrage manuel.
+    //
+    // Ce n'est pas ce qui s'est passé. Dès que le nom a eu un propriétaire, un
+    // item est apparu, sans que rien ne soit relancé :
+    //
+    //     RegisteredStatusNotifierItems -> [":1.154/org/blueman/sni"]
+    //     :1.154 = blueman-tray, PID 1953, démarré à 10:19:57
+    //     le shell qui prend le nom : PID 1735, démarré à 10:19:56
+    //     les deux tournent depuis, sans redémarrage (etimes identiques)
+    //
+    // Deux corrections à retenir. D'abord ce n'est pas blueman-applet qui
+    // publie l'item mais blueman-tray, un second processus qu'il lance —
+    // regarder le seul blueman-applet sur le bus donnait donc une réponse
+    // juste à une mauvaise question. Ensuite ce processus SURVEILLE
+    // l'apparition du nom au lieu de tester une fois au démarrage : il
+    // s'enregistre à chaud.
+    //
+    // Ça ne se généralise pas. Un applet qui, lui, ne teste qu'au démarrage
+    // restera absent, et l'ordre de lancement redeviendra la seule explication
+    // d'un tiroir vide. C'est la première chose à vérifier avant de déboguer
+    // le QML : `busctl --user get-property org.kde.StatusNotifierWatcher \
+    // /StatusNotifierWatcher org.kde.StatusNotifierWatcher \
+    // RegisteredStatusNotifierItems` dit si le tiroir est vide parce que
+    // personne ne s'est enregistré, ou parce que l'affichage est cassé.
+    //
+    // Le nom est pris dès la première référence à ce singleton, donc au
+    // démarrage du shell puisque Connectivity.qml lit Services en permanence.
+    // Ce n'est pas un coût : posséder un nom D-Bus est passif, au même titre
+    // que les connexions NetworkManager et BlueZ décrites en tête de fichier.
+    // C'est même l'inverse d'un coût — sans ce nom pris tôt, un applet lancé
+    // avant le shell est définitivement perdu pour la session.
+    //
+    // VÉRIFIÉ à l'exécution : SystemTray.items est un UntypedObjectModel, pas
+    // une liste. On expose .values, le tableau JS, parce que les deux
+    // consommateurs du tiroir le filtrent (NeedsAttention) — et parce qu'ici
+    // le tableau vide est le cas nominal, pas l'exception.
+    readonly property var trayModel: SystemTray.items ?? null
+    readonly property var trayItems: root.trayModel ? root.trayModel.values : []
+
+    // L'énumération vit dans Quickshell.Services.SystemTray. L'exposer ici
+    // évite à Tray.qml d'importer le module de service : la règle du projet
+    // est qu'un module ne parle qu'à Services.
+    //
+    // VÉRIFIÉ à l'exécution : Passive = 0, Active = 1, NeedsAttention = 2.
+    readonly property int trayAttention: Status.NeedsAttention
+
     // --- Luminosité ---------------------------------------------------------
     // Aucun module natif. On écrit directement dans sysfs : le fichier
     // appartient au groupe `video` dont tu fais partie, donc ni brightnessctl
@@ -334,48 +397,250 @@ Singleton {
         onFileChanged: reload()
     }
 
-    // --- Ne pas déranger (swaync) ----------------------------------------
-    // La seule source qui ne notifie rien : ni propriété, ni signal
-    // exploitable. On ne connaît l'état que parce qu'on vient de le demander.
+    // --- swaync : présence, compteur, « ne pas déranger » -------------------
+    // UNE source pour les trois, et c'est le point de la section : swaync
+    // n'expose pas un état DND d'un côté et un compteur de l'autre, il émet
+    // les deux dans le même signal. Deux chemins de lecture pourraient
+    // diverger ; il n'y en a qu'un.
     //
-    // swaync expose bien un signal Subscribe, mais l'écouter demanderait un
-    // `busctl monitor` permanent, ce qui violerait « rien ne tourne panneau
-    // fermé ». On relit donc à chaque ouverture (voir acquire()).
+    // Ce que dit swaync 0.12.6, vérifié au dbus-monitor :
+    //   SubscribeV2 (ubbb)   = (count, dnd, cc_open, inhibited)   signal
+    //   GetSubscribeData     → (bbub) = (dnd, cc_open, count, inhibited)
+    // `Subscribe (ubb)` existe encore à l'introspection mais n'est PLUS émis :
+    // s'y abonner ne donnerait jamais rien. C'est SubscribeV2 ou rien.
     //
-    // Toute interaction passe par une porte NameHasOwner, et ce n'est pas de la
-    // prudence gratuite. Mesuré, swaync arrêté :
-    //   swaync-client -D  → rc=0, 2041 ms, affiche "false"   ment en silence
-    //   busctl GetDnd     → rc=1, 1721 ms, mais ACTIVE swaync par D-Bus
-    //   NameHasOwner      → rc=0,   23 ms, honnête, n'active rien
-    // Le code de retour de swaync-client est inutilisable : il vaut 0 même
-    // quand le démon est mort, et la sortie "false" est indiscernable d'une
-    // vraie réponse. La porte est la seule détection fiable.
+    // COÛT MESURÉ. Deux instances de la config côte à côte, l'une avec le
+    // moniteur, l'autre sans, sur 6,5 min puis 5 min :
     //
-    // Elle est refaite à CHAQUE appel, pas seulement à l'ouverture : swaync
-    // peut mourir entre l'ouverture du panneau et le clic.
-    property bool dndAvailable: false
+    //   au repos            CPU du moniteur      0 ms en 6,5 min
+    //                       réveils du moniteur  0,0 / min sur 5 min
+    //                       écart de CPU A↔B     ±10 ms, soit ±1 tick noyau
+    //                       RSS du moniteur      2,7 Mo
+    //   sous rafale         250 notifications envoyées puis refermées,
+    //                       500 événements SubscribeV2 en 8 s :
+    //                       moniteur   30 ms de CPU, 1 réveil par événement
+    //                       shell      100 ms de CPU au-delà du témoin
+    //                       → 0,26 ms et ~2 réveils PAR notification
+    //
+    // L'alternative écartée était un sondage périodique par Process one-shot.
+    // Mesurée aussi, forme gatée (porte + GetSubscribeData), par sondage :
+    //   client (sh + 2 busctl)  9,6 réveils   8,85 ms CPU   10,5 ms de latence
+    //   dbus-broker            18,9 réveils   0,80 ms
+    //   swaync                 10,4 réveils   0,90 ms
+    //   ------------------------------------------------------------------
+    //   total                 ~39 réveils    ~10,6 ms CPU  + 3 processus
+    //
+    // Un sondage coûte donc autant que 40 notifications reçues, et il le coûte
+    // même quand il ne se passe rien. À 30 s de cadence : 80 réveils/min et un
+    // compteur périmé jusqu'à 30 s. Le moniteur : 0 réveil/min et l'affichage
+    // suit le signal. Le coût du moniteur est proportionnel aux notifications,
+    // celui du sondage au temps qui passe — c'est ce qui tranche.
+    //
+    // LA PORTE S'APPLIQUE AUSSI AU MONITEUR, et la commande évidente la viole.
+    // Mesuré, swaync arrêté, en lançant chaque moniteur sur le nom mort :
+    //   gdbus monitor --dest org.erikreider.swaync.cc   → DÉMARRE swaync
+    //   dbus-monitor "…interface='…swaync.cc'…"         → ne démarre rien
+    //   busctl --user monitor org.erikreider.swaync.cc  → ne démarre rien
+    // org.erikreider.swaync.cc a un fichier d'activation D-Bus
+    // (/usr/share/dbus-1/services/), donc tout ce qui RÉSOUT le nom réveille le
+    // démon. `gdbus monitor --dest` pose une surveillance de nom avec
+    // auto-démarrage ; filtrer sur `interface=` ne résout aucun nom, donc
+    // n'active rien — et capte quand même les signaux si swaync arrive après
+    // (vérifié : moniteur lancé démon éteint, puis start, puis notification →
+    // l'événement passe). L'activation n'a lieu qu'AU LANCEMENT du moniteur :
+    // un moniteur déjà en vol ne ressuscite pas le démon (vérifié, swaync
+    // arrêté sous lui, toujours mort à t+10 s).
+    //
+    // MORT AVEC LE SHELL. `setpriv --pdeathsig TERM` pose PR_SET_PDEATHSIG sur
+    // l'enfant avant d'exec. Trois chemins, tous vérifiés :
+    //   arrêt normal (SIGTERM) → Quickshell tue l'enfant       moniteur MORT
+    //   rechargement à chaud   → l'enfant est relancé, pas dupliqué (1 seul)
+    //   kill -9 du shell       → le noyau signale l'enfant     moniteur MORT
+    // Sans setpriv, mesuré : le kill -9 laisse un dbus-monitor réparenté à
+    // PID 1, qui survit indéfiniment. Quickshell ne pose pas PDEATHSIG
+    // lui-même, et ne le peut pas — SIGKILL n'est pas interceptable.
+    property bool swayncAvailable: false
+    property int notifCount: 0
     property bool dndEnabled: false
     property bool dndBusy: false
 
-    readonly property string dndGate:
+    // La porte. Inchangée, et toujours pour la même raison : le code de retour
+    // de swaync-client vaut 0 même démon mort, et un `busctl call` réveillerait
+    // swaync au lieu de constater son absence. Mesuré démon arrêté :
+    //   swaync-client -D  → rc=0, 2041 ms, affiche "false"   ment en silence
+    //   busctl GetDnd     → rc=1, 1721 ms, mais ACTIVE swaync
+    //   NameHasOwner      → rc=0,   23 ms, honnête, n'active rien
+    readonly property string swayncGate:
         "busctl --user call org.freedesktop.DBus /org/freedesktop/DBus"
         + " org.freedesktop.DBus NameHasOwner s org.erikreider.swaync.cc"
 
-    // -dn / -df posent une valeur explicite et impriment l'état résultant :
-    // la confirmation est la sortie de la commande elle-même, pas une seconde
-    // lecture. On n'utilise pas -d (bascule aveugle) : on veut demander un état
-    // précis pour pouvoir comparer.
-    function dndRun(action: string): void {
+    readonly property string swayncRead:
+        "busctl --user call org.erikreider.swaync.cc /org/erikreider/swaync/cc"
+        + " org.erikreider.swaync.cc GetSubscribeData"
+
+    function swayncCmd(action: string): var {
+        return ["sh", "-c",
+            'case "$(' + root.swayncGate + ')" in *true*) ' + action + ' ;; *) echo absent ;; esac'];
+    }
+
+    // --- Le moniteur --------------------------------------------------------
+    // Deux règles dans le MÊME processus. La seconde n'est pas un luxe : sans
+    // elle, entre la mort et le retour de swaync, le compteur afficherait sa
+    // dernière valeur connue comme si elle était vraie.
+    //
+    // Attention au piège mesuré : `sender=` ET `arg0=` dans la même règle ne
+    // délivrent RIEN en mode moniteur sur dbus-broker (0 NameOwnerChanged reçu,
+    // vérifié). `interface=` + `arg0=` en délivre exactement 2, un par
+    // transition. C'est la forme retenue.
+    Process {
+        id: swayncMon
+
+        running: true
+        command: ["setpriv", "--pdeathsig", "TERM",
+                  "dbus-monitor", "--session",
+                  "type='signal',interface='org.erikreider.swaync.cc',member='SubscribeV2'",
+                  "type='signal',interface='org.freedesktop.DBus',member='NameOwnerChanged',arg0='org.erikreider.swaync.cc'"]
+
+        stdout: SplitParser { onRead: line => root.swayncLine(line) }
+
+        // La graine part quand le moniteur est lancé, pas avant : si elle
+        // partait la première, un événement tombé entre sa réponse et
+        // l'attachement des règles serait perdu sans que rien ne le rattrape.
+        // Dans l'autre sens, un signal qui double la graine est détecté et la
+        // graine est jetée (voir seedProc).
+        onStarted: root.seedSwaync()
+
+        // Le moniteur mort, plus rien ne nous contredit : on afficherait
+        // indéfiniment le dernier état connu comme s'il était vrai. Même
+        // règle que partout ailleurs ici — ne pas savoir n'est pas « zéro ».
+        // 2 s de battement pour ne pas boucler à pleine vitesse si
+        // dbus-monitor n'arrive pas à s'attacher au bus.
+        onExited: {
+            root.swayncAvailable = false;
+            monRevive.restart();
+        }
+    }
+
+    Timer {
+        id: monRevive
+
+        interval: 2000
+
+        onTriggered: swayncMon.running = true
+    }
+
+    // dbus-monitor imprime un en-tête puis une ligne par argument. On ne
+    // reconstruit donc pas un message, on compte des lignes : l'en-tête dit
+    // combien en attendre, les suivantes sont les valeurs. Pas d'awk dans un
+    // tuyau — ce serait deux processus de plus pour ce que six lignes de QML
+    // font sans réveil supplémentaire.
+    property int swayncPending: 0
+    property string swayncKind: ""
+    property var swayncArgs: []
+
+    // Compteur d'événements reçus, uniquement pour départager une graine en vol
+    // et un signal arrivé entre-temps (voir seedProc).
+    property int swayncSeq: 0
+
+    function swayncLine(line: string): void {
+        if (root.swayncPending > 0) {
+            // "   uint32 4" / "   boolean false" / "   string \":1.84\""
+            const v = line.trim().split(" ").slice(1).join(" ");
+            root.swayncArgs.push(v.replace(/^"|"$/g, ""));
+            if (--root.swayncPending > 0) return;
+            if (root.swayncKind === "sub") root.applySubscribe(root.swayncArgs);
+            else root.applyNameOwner(root.swayncArgs);
+            return;
+        }
+        if (line.indexOf("member=SubscribeV2") !== -1) {
+            root.swayncKind = "sub"; root.swayncArgs = []; root.swayncPending = 4;
+        } else if (line.indexOf("member=NameOwnerChanged") !== -1) {
+            root.swayncKind = "noc"; root.swayncArgs = []; root.swayncPending = 3;
+        }
+    }
+
+    // Recevoir un signal PROUVE la présence : aucune porte à rejouer ici.
+    function applySubscribe(a: var): void {
+        root.swayncAvailable = true;
+        root.notifCount = parseInt(a[0]);
+        root.dndEnabled = a[1] === "true";
+        root.swayncSeq++;
+    }
+
+    // NameOwnerChanged(nom, ancien, nouveau). Nouveau vide = swaync est mort ;
+    // on ne garde pas le dernier compteur connu, on déclare l'ignorance — la
+    // cloche passe en Unavailable et le nombre disparaît. Nouveau non vide =
+    // swaync est de retour, et on redemande l'état plutôt que d'attendre.
+    //
+    // En pratique swaync émet un SubscribeV2 ~20 ms après avoir pris le nom
+    // (mesuré), donc la graine et le signal se croisent. C'est pour ça que la
+    // graine est datée : elle ne s'applique que si aucun signal ne l'a doublée.
+    function applyNameOwner(a: var): void {
+        const arrived = a[2] !== "";
+        root.swayncAvailable = arrived;
+        if (!arrived) {
+            root.notifCount = 0;
+            root.dndEnabled = false;
+        } else {
+            root.seedSwaync();
+        }
+    }
+
+    // --- La graine ----------------------------------------------------------
+    // Le moniteur ne dit rien tant que rien ne bouge : au démarrage du shell,
+    // swaync peut tourner depuis des heures avec quatre notifications en
+    // attente et n'émettre aucun signal avant la prochaine. Un seul appel
+    // one-shot, gaté, au démarrage et à chaque retour du démon.
+    property int seedSeq: 0
+
+    function seedSwaync(): void {
+        if (seedProc.running) return;
+        root.seedSeq = root.swayncSeq;
+        seedProc.command = root.swayncCmd(root.swayncRead);
+        seedProc.running = true;
+    }
+
+    Process {
+        id: seedProc
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const m = /^\(bbub\) (true|false) (true|false) (\d+)/.exec(text.trim());
+                // "absent", vide, ou n'importe quoi d'autre : on ne sait pas,
+                // et ne pas savoir n'est pas « zéro notification ».
+                if (!m) { root.swayncAvailable = false; return; }
+                root.swayncAvailable = true;
+                if (root.swayncSeq !== root.seedSeq) return;   // doublée par un signal
+                root.dndEnabled = m[1] === "true";
+                root.notifCount = parseInt(m[3]);
+            }
+        }
+    }
+
+    // --- Les deux seules actions --------------------------------------------
+    // Elles écrivent une commande, elles ne lisent aucun état : la confirmation
+    // arrive par le moniteur, comme n'importe quel changement venu d'ailleurs.
+    // C'est ce qui garantit qu'un DND basculé depuis waybar, un raccourci
+    // clavier ou swaync lui-même s'affiche exactement pareil qu'un DND basculé
+    // depuis le panneau.
+    //
+    // La porte est rejouée à chaque appel bien que `swayncAvailable` soit tenu
+    // à jour au signal près : entre le clic et le fork, swaync peut mourir, et
+    // sans porte le `busctl` de swaync-client le ressusciterait.
+    function setDnd(v: bool): void {
         if (root.dndBusy) return;   // une commande est déjà en vol
         root.dndBusy = true;
-        dndProc.command = ["sh", "-c",
-            'case "$(' + root.dndGate + ')" in *true*) ' + action + ' ;; *) echo absent ;; esac'];
+        dndProc.command = root.swayncCmd(v ? "swaync-client -dn" : "swaync-client -df");
         dndProc.running = true;
         dndWatchdog.restart();
     }
 
-    function refreshDnd(): void { root.dndRun("swaync-client -D"); }
-    function setDnd(v: bool): void { root.dndRun(v ? "swaync-client -dn" : "swaync-client -df"); }
+    // Ouvre le centre de notifications de swaync — PAS le centre de contrôle.
+    function toggleNotificationCenter(): void {
+        if (ccProc.running) return;
+        ccProc.command = root.swayncCmd("swaync-client -t");
+        ccProc.running = true;
+    }
 
     Process {
         id: dndProc
@@ -383,13 +648,18 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 dndWatchdog.stop();
-                const out = text.trim();
-                // Seules deux sorties sont une réponse. "absent", une chaîne
-                // vide ou n'importe quoi d'autre signifie qu'on ne sait pas —
-                // et ne pas savoir n'est pas « éteint ».
-                root.dndAvailable = (out === "true" || out === "false");
-                if (root.dndAvailable) root.dndEnabled = (out === "true");
+                if (text.trim() === "absent") root.swayncAvailable = false;
                 root.dndBusy = false;
+            }
+        }
+    }
+
+    Process {
+        id: ccProc
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.trim() === "absent") root.swayncAvailable = false;
             }
         }
     }
@@ -404,10 +674,11 @@ Singleton {
 
         onTriggered: {
             dndProc.running = false;
-            root.dndAvailable = false;
+            root.swayncAvailable = false;
             root.dndBusy = false;
         }
     }
+
 
     // --- État coûteux, asservi à la visibilité ------------------------------
     // Liaisons déclaratives, pas d'appels impératifs : il n'existe pas de

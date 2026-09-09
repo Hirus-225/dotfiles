@@ -100,10 +100,14 @@ Item {
     // frame. `value` n'est donc lu qu'une fois par salve, après que le service
     // s'est posé (mesuré : 2 à 3 ms, moins d'une frame).
     //
-    // Contrairement au Volume.qml de la barre, l'application est
-    // proportionnelle et non quantifiée au cran : sur un slider un pavé tactile
-    // doit glisser, pas sauter. Une molette de souris envoie exactement 120 par
-    // cran, donc un cran = un `step` — les deux entrées restent justes.
+    // Contrairement à la molette de la bulle (Connectivity.qml), l'application
+    // est proportionnelle et non quantifiée au cran : sur un slider un pavé
+    // tactile doit glisser, pas sauter. Une molette de souris envoie exactement
+    // 120 par cran, donc un cran = un `step` — les deux entrées restent justes.
+    //
+    // Les deux chasses coexistent volontairement : la bulle règle par crans de
+    // 5 % parce qu'on la vise sans regarder, le slider glisse en continu parce
+    // qu'on le regarde en le bougeant.
     property real pending: 0
 
     function applyWheel(delta: real): void {

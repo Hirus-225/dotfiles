@@ -194,10 +194,10 @@ PanelWindow {
                     width: toggles.cell
 
                     icon: "\u{F1F6}"
-                    toggleState: Services.dndBusy       ? Toggle.State.Busy
-                               : !Services.dndAvailable ? Toggle.State.Unavailable
-                               : Services.dndEnabled    ? Toggle.State.On
-                                                        : Toggle.State.Off
+                    toggleState: Services.dndBusy          ? Toggle.State.Busy
+                               : !Services.swayncAvailable ? Toggle.State.Unavailable
+                               : Services.dndEnabled       ? Toggle.State.On
+                                                           : Toggle.State.Off
 
                     onToggled: Services.setDnd(!Services.dndEnabled)
                 }

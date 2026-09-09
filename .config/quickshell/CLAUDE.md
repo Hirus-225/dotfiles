@@ -62,5 +62,11 @@ should extend `StyledText` too.
 - **Hyprland** — `Workspaces.qml` uses `Quickshell.Hyprland` (`Hyprland.workspaces`, `Hyprland.dispatch`).
 - **UPower** — `Battery.qml` uses `Quickshell.Services.UPower.UPower.displayDevice`.
 - **pywal** — `~/.cache/wal/colors.json`; without it the theme silently stays on the fallback palette.
+- **swaync** — keeps the `org.freedesktop.Notifications` server; Quickshell never takes it over.
+  `Services.qml` only *reads* swaync, through a permanent `dbus-monitor` child listening for
+  `SubscribeV2` on `org.erikreider.swaync.cc` plus `NameOwnerChanged` for that name. That child is
+  wrapped in `setpriv --pdeathsig TERM` (util-linux) so a `kill -9` of the shell cannot orphan it.
+  Every one-shot command aimed at swaync goes through a `NameHasOwner` gate, because the name is
+  D-Bus-activatable and any bare `busctl call` would start the daemon.
 - **JetBrainsMono Nerd Font** — hardcoded in `Theme.fontFamily`.
 - The clock is formatted with an explicit `fr_FR` locale, independent of the system locale.
